@@ -12,7 +12,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r setup}
+```{r setup, message=FALSE, warning=FALSE}
 # Set up
 library(knitr)
 library(here)
@@ -39,9 +39,77 @@ source(here("source", "read_excel_allsheets.R"))
 # Read in data
 ## Map layers
 
+```{r, results='hide'}
+proj_crs <- 32631
+
+# Read in map layers
+belgium_sf <- st_read(here("data", "maps", "Belgie.shp")) %>%
+  st_transform(proj_crs)
+utm5_total_sf <- st_read(here("data", "maps", "utm5.shp")) %>%
+  st_transform(proj_crs)
+utm10_total_sf <- st_read(here("data", "maps", "utm10.shp")) %>%
+  st_transform(proj_crs)
+rivieren_sf <- st_read(here("data", "maps", "hoofdrivierenbel.shp")) %>%
+  st_transform(proj_crs)
+kanalen_sf <- st_read(here("data", "maps", "Kanalen.shp")) %>%
+  st_transform(proj_crs)
+```
+
+
+```{r}
+# Select UTM grids that overlap with Belgium
+umt5_tags <- utm5_total_sf %>%
+  st_intersection(belgium_sf) %>%
+  pull(TAG)
+
+utm5_sf <- utm5_total_sf %>%
+  filter(TAG %in% umt5_tags)
+
+umt10_tags <- utm10_total_sf %>%
+  st_intersection(belgium_sf) %>%
+  pull(TAG)
+
+utm10_sf <- utm10_total_sf %>%
+  filter(TAG %in% umt10_tags)
+
+# Combine water ways Belgium
+waterlopen_sf <- bind_rows(
+  rivieren_sf %>%
+    select("naam" = NAAM) %>%
+    mutate(waterloop = "rivier"),
+  kanalen_sf %>%
+    select("naam" = NAAM) %>%
+    mutate(waterloop = "kanaal"))
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = belgium_sf, fill = "white",
+          linewidth = 0.8) +
+  geom_sf(data = waterlopen_sf, aes(colour = waterloop)) +
+  geom_sf(data = utm5_sf, fill = alpha("white", 0),
+          linewidth = 0.6) +
+  labs(title = "UTM 5 km", x = "", y = "", colour = "Waterloop") +
+  coord_sf(datum = proj_crs) +
+  theme_void() +
+  theme(legend.position = c(0.2, 0.2))
+
+ggplot() +
+  geom_sf(data = belgium_sf, fill = "white",
+          linewidth = 0.8) +
+  geom_sf(data = waterlopen_sf, aes(colour = waterloop)) +
+  geom_sf(data = utm10_sf, fill = alpha("white", 0),
+          linewidth = 0.6) +
+  labs(title = "UTM 10 km", x = "", y = "", colour = "Waterloop") +
+  coord_sf(datum = proj_crs) +
+  theme_void() +
+  theme(legend.position = c(0.2, 0.2))
+```
+
 ## Occurrence data
 
 We read in and prepare the data from after 1995.
+Taxonomic information was added manually.
 
 ```{r}
 # Read in data post 1995
@@ -111,4 +179,3 @@ data_pre_1995 <- do.call(rbind.data.frame, data_nijs) %>%
 
 glimpse(data_pre_1995)
 ```
-
