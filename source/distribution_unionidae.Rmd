@@ -184,6 +184,8 @@ data_post_1995_sf <- data_post_1995_sf %>%
          test = ifelse(utm_10km == test_tag, TRUE, FALSE))
 ```
 
+We have some mismatches between the UTM designation in the datasets and recalculated UTM tags (10 km).
+
 ```{r}
 mismatch_utm <- data_post_1995_sf %>%
   st_drop_geometry() %>%
@@ -195,6 +197,8 @@ mismatch_utm <- data_post_1995_sf %>%
 mismatch_utm %>%
   kable()
 ```
+
+Some points fall outside Belgium.
 
 ```{r}
 outside_be <- data_post_1995_sf_raw %>%
