@@ -37,30 +37,78 @@ source(here("source", "read_excel_allsheets.R"))
 ```
 
 # Read in data
+## Map layers
 
+## Occurrence data
 
+We read in and prepare the data from after 1995.
+
+```{r}
+# Read in data post 1995
+data_succinea_raw <- read_excel_allsheets(
+  here("data", "raw",
+       "AA-Locaties-Najaden-2023-10-25-vanaf1995-Final.xlsx")
+  )
+
+# Get species list
+species_list <- lapply(names(data_succinea_raw), function(sheet) {
+  data_succinea_raw[[sheet]][1,] %>%
+    select(Genus, Species, Author) %>%
+    mutate(name = sheet)
+})
+species_df <- do.call(rbind.data.frame, species_list)
+
+# Prepare data post 1995
+data_succinea <- lapply(names(data_succinea_raw), function(sheet) {
+  data_succinea_raw[[sheet]] %>%
+    select(Locality:Alive, -c(`Lat., Long.`, "Date")) %>%
+    mutate(name = sheet) %>%
+    rename_with(~tolower(gsub("-", "_", .x))) %>%
+    rename_with(~gsub( " .*$", "", .x))
+})
+
+data_post_1995 <- do.call(rbind.data.frame, data_succinea) %>%
+  full_join(species_df, by = join_by(name)) %>%
+  select(-name) %>%
+  rename_with(tolower) %>%
+  pivot_longer(cols = c("empty", "alive"),
+               names_to = "state",
+               values_to = "number") %>%
+  drop_na(number) %>%
+  rowid_to_column(var = "id") %>%
+  mutate(period = "post_1995",
+         id = paste(id, period, sep = "_"))
+
+glimpse(data_post_1995)
+```
+
+We read in and prepare the data from before 1995.
 
 ```{r}
 # Read in data pre 1995
 data_nijs_raw <- read_excel_allsheets(
   here("data", "raw",
        "Alfa-Unionidae 6 soorten-Verspreiding-Nijs-1995-Empty-Alive.xlsx")
-  )
+)
 
-# Read in data post 1995
-data_succinea_raw <- read_excel_allsheets(
-  here("data", "raw",
-       "AA-Locaties-Najaden-2023-10-25-vanaf1995-Final.xlsx")
-  )
-```
-
-```{r}
-species_list <- lapply(names(data_succinea_raw), function(name) {
-  data_succinea[[name]][1,] %>%
-    select(Genus, Species, Author) %>%
-    mutate(name = name)
+# Prepare data pre 1995
+data_nijs <- lapply(names(data_nijs_raw), function(sheet) {
+  data_nijs_raw[[sheet]] %>%
+    mutate(name = sheet) %>%
+    rename("empty" = `Empty t/m 1994`, "alive" = `Alive t/m 1994`)
 })
-species_df <- do.call(rbind.data.frame, species_list)
-```
 
+data_pre_1995 <- do.call(rbind.data.frame, data_nijs) %>%
+  full_join(species_df, by = join_by(name)) %>%
+  select(-name) %>%
+  rename_with(tolower) %>%
+  pivot_longer(cols = c("empty", "alive"),
+               names_to = "state",
+               values_to = "utm_10km") %>%
+  rowid_to_column(var = "id") %>%
+  mutate(period = "pre_1995",
+         id = paste(id, period, sep = "_"))
+
+glimpse(data_pre_1995)
+```
 
