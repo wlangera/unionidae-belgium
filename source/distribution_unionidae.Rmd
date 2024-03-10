@@ -36,5 +36,31 @@ library(readxl)
 source(here("source", "read_excel_allsheets.R"))
 ```
 
+# Read in data
+
+
+
+```{r}
+# Read in data pre 1995
+data_nijs_raw <- read_excel_allsheets(
+  here("data", "raw",
+       "Alfa-Unionidae 6 soorten-Verspreiding-Nijs-1995-Empty-Alive.xlsx")
+  )
+
+# Read in data post 1995
+data_succinea_raw <- read_excel_allsheets(
+  here("data", "raw",
+       "AA-Locaties-Najaden-2023-10-25-vanaf1995-Final.xlsx")
+  )
+```
+
+```{r}
+species_list <- lapply(names(data_succinea_raw), function(name) {
+  data_succinea[[name]][1,] %>%
+    select(Genus, Species, Author) %>%
+    mutate(name = name)
+})
+species_df <- do.call(rbind.data.frame, species_list)
+```
 
 
