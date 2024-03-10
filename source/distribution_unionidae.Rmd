@@ -39,6 +39,8 @@ source(here("source", "read_excel_allsheets.R"))
 # Read in data
 ## Map layers
 
+We read in different map layers to create distribution maps.
+
 ```{r, results='hide'}
 proj_crs <- 32631
 
@@ -54,7 +56,6 @@ rivieren_sf <- st_read(here("data", "maps", "hoofdrivierenbel.shp")) %>%
 kanalen_sf <- st_read(here("data", "maps", "Kanalen.shp")) %>%
   st_transform(proj_crs)
 ```
-
 
 ```{r}
 # Select UTM grids that overlap with Belgium
@@ -81,6 +82,8 @@ waterlopen_sf <- bind_rows(
     select("naam" = NAAM) %>%
     mutate(waterloop = "kanaal"))
 ```
+
+We visualise the layers.
 
 ```{r}
 ggplot() +
