@@ -1,0 +1,40 @@
+---
+title: "Distribution maps Unionidae"
+author: "Ward Langeraert"
+date: "`r Sys.Date()`"
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup}
+# Set up
+library(knitr)
+library(here)
+opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE)
+opts_knit$set(root.dir = here())
+
+# Conflicting packages
+conflicted::conflicts_prefer(dplyr::filter)
+conflicted::conflicts_prefer(dplyr::select)
+conflicted::conflicts_prefer(dplyr::lag)
+
+# Packages
+library(tidyverse)
+library(sf)
+library(readxl)
+
+# Source
+source(here("source", "read_excel_allsheets.R"))
+```
+
+
+
