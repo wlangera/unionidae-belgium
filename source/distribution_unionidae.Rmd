@@ -153,6 +153,62 @@ data_post_1995 <- do.call(rbind.data.frame, data_succinea) %>%
 glimpse(data_post_1995)
 ```
 
+We calculate UTM 5 km grid squares based on coordinates.
+
+```{r}
+data_post_1995_sf_raw <- data_post_1995 %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
+  st_transform(proj_crs)
+
+# Only select data within Belgium
+data_post_1995_sf <- data_post_1995_sf_raw %>%
+  st_intersection(belgium_sf) %>%
+  select(-names(belgium_sf))
+
+# Get UTM 5 km tags
+intersection_occurrences_utm5 <- st_intersection(data_post_1995_sf, utm5_sf) %>%
+  st_drop_geometry() %>%
+  select(id, TAG)
+
+# Get UTM 10 km tags
+intersection_occurrences_utm10 <- st_intersection(data_post_1995_sf, utm10_sf) %>%
+  st_drop_geometry() %>%
+  select(id, TAG)
+
+data_post_1995_sf <- data_post_1995_sf %>%
+  full_join(intersection_occurrences_utm5, by = join_by(id)) %>%
+  rename(utm_5km = TAG) %>%
+  full_join(intersection_occurrences_utm10, by = join_by(id)) %>%
+  rename(utm_10km_new = TAG) %>%
+  mutate(test_tag = substr(utm_5km, 1, 4),
+         test = ifelse(utm_10km == test_tag, TRUE, FALSE))
+```
+
+```{r}
+mismatch_utm <- data_post_1995_sf %>%
+  st_drop_geometry() %>%
+  filter(test == FALSE) %>%
+  select(id, utm_5km, utm_10km_new) %>%
+  left_join(data_post_1995, by = join_by(id)) %>%
+  select(id, locality, genus, species, author, state, longitude, latitude,
+         utm_10km, utm_5km_new = utm_5km, utm_10km_new)
+mismatch_utm %>%
+  kable()
+```
+
+```{r}
+outside_be <- data_post_1995_sf_raw %>%
+  st_difference(belgium_sf) %>%
+  st_drop_geometry() %>%
+  select(id) %>%
+  left_join(data_post_1995, by = join_by(id)) %>%
+  select(id, locality, genus, species, author, state, longitude, latitude,
+         utm_10km)
+
+outside_be %>%
+  kable()
+```
+
 We read in and prepare the data from before 1995.
 
 ```{r}
