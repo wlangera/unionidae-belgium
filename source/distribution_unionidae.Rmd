@@ -89,8 +89,12 @@ We visualise the layers.
 ggplot() +
   geom_sf(data = belgium_sf, fill = "white",
           linewidth = 0.8) +
-  geom_sf(data = waterlopen_sf, aes(colour = waterloop)) +
+  geom_sf(data = waterlopen_sf, aes(colour = waterloop),
+          linewidth = 0.8) +
+  scale_color_manual(values = c("cornflowerblue", "darkblue")) +
   geom_sf(data = utm5_sf, fill = alpha("white", 0),
+          linewidth = 0.3, colour = "grey") +
+  geom_sf(data = utm10_sf, fill = alpha("white", 0),
           linewidth = 0.6) +
   labs(title = "UTM 5 km", x = "", y = "", colour = "Waterloop") +
   coord_sf(datum = proj_crs) +
@@ -100,7 +104,9 @@ ggplot() +
 ggplot() +
   geom_sf(data = belgium_sf, fill = "white",
           linewidth = 0.8) +
-  geom_sf(data = waterlopen_sf, aes(colour = waterloop)) +
+  geom_sf(data = waterlopen_sf, aes(colour = waterloop),
+          linewidth = 0.8) +
+  scale_color_manual(values = c("cornflowerblue", "darkblue")) +
   geom_sf(data = utm10_sf, fill = alpha("white", 0),
           linewidth = 0.6) +
   labs(title = "UTM 10 km", x = "", y = "", colour = "Waterloop") +
