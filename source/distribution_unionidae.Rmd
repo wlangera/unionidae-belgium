@@ -29,6 +29,7 @@ conflicted::conflicts_prefer(dplyr::lag)
 
 # Packages
 library(tidyverse)
+library(ggpattern)
 library(sf)
 library(readxl)
 
@@ -248,3 +249,56 @@ data_pre_1995 <- do.call(rbind.data.frame, data_nijs) %>%
 
 glimpse(data_pre_1995)
 ```
+
+
+# Map data
+
+We create a dataset where each row is an utm grid square.
+
+-  5 km post 1995
+-  10 km post 1995
+-  10 km pre 1995
+
+```{r}
+data_post_1995_utm5km <- data_post_1995_sf %>%
+  st_drop_geometry() %>%
+  distinct(genus, species, author, state, period, utm_5km, utm_10km_new) %>%
+  mutate(status = ifelse(state == "alive", "levend", "leeg")) %>%
+  select(-state) %>%
+  pivot_wider(id_cols = everything(), names_from = "status",
+              values_from = "status") %>%
+  mutate(state_fill = paste(levend, leeg, sep = " + "),
+         state_fill = gsub("^NA\\s\\+\\s", "", state_fill),
+         state_fill = gsub("\\s\\+\\sNA$", "", state_fill)) %>%
+  mutate(spec_name = paste(genus, species, author)) %>%
+  select(utm_5km, utm_10km = utm_10km_new, period, spec_name, genus, species,
+         author, state_fill)
+
+data_post_1995_utm10km <- data_post_1995_sf %>%
+  st_drop_geometry() %>%
+  distinct(genus, species, author, state, period, utm_10km_new) %>%
+  mutate(status = ifelse(state == "alive", "levend", "leeg")) %>%
+  select(-state) %>%
+  pivot_wider(id_cols = everything(), names_from = "status",
+              values_from = "status") %>%
+  mutate(state_fill = paste(levend, leeg, sep = " + "),
+         state_fill = gsub("^NA\\s\\+\\s", "", state_fill),
+         state_fill = gsub("\\s\\+\\sNA$", "", state_fill)) %>%
+  mutate(spec_name = paste(genus, species, author)) %>%
+  select(utm_10km = utm_10km_new, period, spec_name, genus, species, author,
+         state_fill)
+
+data_pre_1995_utm10km <- data_pre_1995 %>%
+  distinct(genus, species, author, state, period, utm_10km) %>%
+  mutate(status = ifelse(state == "alive", "levend", "leeg")) %>%
+  select(-state) %>%
+  pivot_wider(id_cols = everything(), names_from = "status",
+              values_from = "status") %>%
+  mutate(state_fill = paste(levend, leeg, sep = " + "),
+         state_fill = gsub("^NA\\s\\+\\s", "", state_fill),
+         state_fill = gsub("\\s\\+\\sNA$", "", state_fill)) %>%
+  mutate(spec_name = paste(genus, species, author)) %>%
+  select(utm_10km, period, spec_name, genus, species, author, state_fill)
+```
+
+
