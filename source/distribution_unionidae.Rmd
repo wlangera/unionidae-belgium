@@ -269,8 +269,10 @@ data_post_1995_utm5km <- data_post_1995_sf %>%
               values_from = "status") %>%
   mutate(state_fill = paste(levend, leeg, sep = " + "),
          state_fill = gsub("^NA\\s\\+\\s", "", state_fill),
-         state_fill = gsub("\\s\\+\\sNA$", "", state_fill)) %>%
-  mutate(spec_name = paste(genus, species, author)) %>%
+         state_fill = gsub("\\s\\+\\sNA$", "", state_fill),
+         state_fill = factor(state_fill,
+                             levels = c("levend", "levend + leeg", "leeg"))) %>%
+  mutate(spec_name = paste(genus, species)) %>%
   select(utm_5km, utm_10km = utm_10km_new, period, spec_name, genus, species,
          author, state_fill)
 
@@ -283,8 +285,10 @@ data_post_1995_utm10km <- data_post_1995_sf %>%
               values_from = "status") %>%
   mutate(state_fill = paste(levend, leeg, sep = " + "),
          state_fill = gsub("^NA\\s\\+\\s", "", state_fill),
-         state_fill = gsub("\\s\\+\\sNA$", "", state_fill)) %>%
-  mutate(spec_name = paste(genus, species, author)) %>%
+         state_fill = gsub("\\s\\+\\sNA$", "", state_fill),
+         state_fill = factor(state_fill,
+                             levels = c("levend", "levend + leeg", "leeg"))) %>%
+  mutate(spec_name = paste(genus, species)) %>%
   select(utm_10km = utm_10km_new, period, spec_name, genus, species, author,
          state_fill)
 
@@ -296,9 +300,51 @@ data_pre_1995_utm10km <- data_pre_1995 %>%
               values_from = "status") %>%
   mutate(state_fill = paste(levend, leeg, sep = " + "),
          state_fill = gsub("^NA\\s\\+\\s", "", state_fill),
-         state_fill = gsub("\\s\\+\\sNA$", "", state_fill)) %>%
-  mutate(spec_name = paste(genus, species, author)) %>%
+         state_fill = gsub("\\s\\+\\sNA$", "", state_fill),
+         state_fill = factor(state_fill,
+                             levels = c("levend", "levend + leeg", "leeg"))) %>%
+  mutate(spec_name = paste(genus, species)) %>%
   select(utm_10km, period, spec_name, genus, species, author, state_fill)
 ```
 
 
+```{r}
+data_post_1995_utm10km %>%
+  filter(spec_name == "Anodonta anatina") %>%
+  full_join(utm10_sf, by = join_by(utm_10km == TAG)) %>%
+  st_as_sf() %>%
+  ggplot() +
+    geom_sf(data = belgium_sf, fill = "white",
+            linewidth = 0.8) +
+    geom_sf(data = waterlopen_sf, aes(colour = waterloop),
+            linewidth = 0.8) +
+    scale_color_manual(values = c("cornflowerblue", "darkblue")) +
+    geom_sf(aes(fill = state_fill), linewidth = 0.6, alpha = 0.7) +
+    scale_fill_discrete(na.translate = FALSE) +
+    labs(title = "Anodonta anatina", x = "", y = "",
+         fill = "Status", colour = "Waterloop") +
+    coord_sf(datum = proj_crs) +
+    theme_void() +
+    theme(legend.position = c(0.2, 0.2),
+          legend.box = "horizontal")
+
+data_post_1995_utm10km %>%
+  filter(spec_name == "Anodonta anatina") %>%
+  full_join(utm10_sf, by = join_by(utm_10km == TAG)) %>%
+  st_as_sf() %>%
+  ggplot() +
+    geom_sf(data = belgium_sf, fill = "white",
+            linewidth = 0.8) +
+    geom_sf(data = waterlopen_sf, aes(colour = waterloop),
+            linewidth = 0.8) +
+    scale_color_manual(values = c("cornflowerblue", "darkblue")) +
+    geom_sf(aes(fill = state_fill, pattern = state_fill),
+            linewidth = 0.6, alpha = 0.7) +
+    scale_fill_discrete(na.translate = FALSE) +
+    labs(title = "Anodonta anatina", x = "", y = "",
+         fill = "Status", colour = "Waterloop") +
+    coord_sf(datum = proj_crs) +
+    theme_void() +
+    theme(legend.position = c(0.2, 0.2),
+          legend.box = "horizontal")
+```
