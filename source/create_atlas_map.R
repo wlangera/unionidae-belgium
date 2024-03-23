@@ -9,6 +9,17 @@ create_atlas_map <- function(data,
                              belgium_map,
                              waterlopen_map,
                              crs) {
+  base_plot <- ggplot() +
+    geom_sf(data = belgium_map, fill = "white",
+            linewidth = 0.8) +
+    geom_sf(data = waterlopen_map, aes(colour = waterloop),
+            linewidth = 0.8) +
+    scale_color_manual(values = c("cornflowerblue", "darkblue"),
+                       guide = guide_legend(
+                         keywidth = unit(1, "cm"),
+                         override.aes = list(
+                           linewidth = 1.5)))
+
   if (missing(grid_utm5)) {
     plot_data <- data %>%
       filter(spec_name == !!species) %>%
@@ -22,16 +33,8 @@ create_atlas_map <- function(data,
       pull(pattern)
 
     if (missing(old_data)) {
-      p <- ggplot(plot_data) +
-        geom_sf(data = belgium_map, fill = "white",
-                linewidth = 0.8) +
-        geom_sf(data = waterlopen_map, aes(colour = waterloop),
-                linewidth = 0.8) +
-        scale_color_manual(values = c("cornflowerblue", "darkblue"),
-                           guide = guide_legend(
-                             override.aes = list(
-                               linewidth = 1.5))) +
-        geom_sf_pattern(aes(fill = state_fill),
+      p <- base_plot +
+        geom_sf_pattern(data = plot_data, aes(fill = state_fill),
                         linewidth = 0.6, alpha = alpha,
                         pattern = pattern,
                         pattern_colour = alpha(empty_col, alpha),
@@ -49,15 +52,7 @@ create_atlas_map <- function(data,
         geom_sf(data = grid_utm10, fill = alpha("white", 0),
                 linewidth = 0.6) +
         labs(x = "", y = "", shape = "Vóór 1995", fill = "Na 1995",
-             colour = "Waterloop") +
-        coord_sf(datum = crs) +
-        theme_void() +
-        theme(legend.position = c(0, 0),
-              legend.justification = c(0, 0),
-              legend.background = element_rect(fill = "white",
-                                               color = "darkgrey"),
-              legend.margin = margin(4, 4, 4, 4),
-              legend.box = "horizontal")
+             colour = "Waterloop")
     } else {
       suppressWarnings({
         centroids_old_data <- old_data %>%
@@ -68,16 +63,8 @@ create_atlas_map <- function(data,
           st_centroid()
       })
 
-      p <- ggplot(plot_data) +
-        geom_sf(data = belgium_map, fill = "white",
-                linewidth = 0.8) +
-        geom_sf(data = waterlopen_map, aes(colour = waterloop),
-                linewidth = 0.8) +
-        scale_color_manual(values = c("cornflowerblue", "darkblue"),
-                           guide = guide_legend(
-                             override.aes = list(
-                               linewidth = 1.5))) +
-        geom_sf_pattern(aes(fill = state_fill),
+      p <- base_plot +
+        geom_sf_pattern(data = plot_data, aes(fill = state_fill),
                         linewidth = 0.6, alpha = alpha,
                         pattern = pattern,
                         pattern_colour = alpha(empty_col, alpha),
@@ -100,20 +87,24 @@ create_atlas_map <- function(data,
         geom_sf(data = grid_utm10, fill = alpha("white", 0),
                 linewidth = 0.6) +
         labs(x = "", y = "", shape = "Vóór 1995", fill = "Na 1995",
-             colour = "Waterloop") +
-        coord_sf(datum = crs) +
-        theme_void() +
-        theme(legend.position = c(0, 0),
-              legend.justification = c(0, 0),
-              legend.background = element_rect(fill = "white",
-                                               color = "darkgrey"),
-              legend.margin = margin(4, 4, 4, 4),
-              legend.box = "horizontal")
+             colour = "Waterloop")
     }
 
   } else {
     print("nog doen")
   }
 
-  return(p)
+  out_plot <- p +
+    coord_sf(datum = crs) +
+    theme_void() +
+    theme(legend.position = c(0, 0.02),
+          legend.justification = c(0, 0),
+          legend.background = element_rect(fill = "white",
+                                           color = "darkgrey"),
+          legend.margin = margin(4, 4, 4, 4),
+          legend.box = "horizontal",
+          legend.title = element_text(size = 14, face = "bold"),
+          legend.text = element_text(size = 12))
+
+  return(out_plot)
 }
