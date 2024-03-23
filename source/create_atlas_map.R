@@ -52,7 +52,11 @@ create_atlas_map <- function(data,
              colour = "Waterloop") +
         coord_sf(datum = crs) +
         theme_void() +
-        theme(legend.position = c(0.2, 0.2),
+        theme(legend.position = c(0, 0),
+              legend.justification = c(0, 0),
+              legend.background = element_rect(fill = "white",
+                                               color = "darkgrey"),
+              legend.margin = margin(4, 4, 4, 4),
               legend.box = "horizontal")
     } else {
       suppressWarnings({
@@ -89,7 +93,7 @@ create_atlas_map <- function(data,
                                                 pattern_density = 0.2,
                                                 pattern_spacing = 0.03))) +
         geom_sf(data = centroids_old_data, aes(shape = state_fill),
-                size = 2) +
+                size = 2.5) +
         scale_shape_manual(values = c(16, 17, 15),
                            guide = guide_legend(
                              override.aes = list(size = 3))) +
@@ -99,7 +103,11 @@ create_atlas_map <- function(data,
              colour = "Waterloop") +
         coord_sf(datum = crs) +
         theme_void() +
-        theme(legend.position = c(0.2, 0.2),
+        theme(legend.position = c(0, 0),
+              legend.justification = c(0, 0),
+              legend.background = element_rect(fill = "white",
+                                               color = "darkgrey"),
+              legend.margin = margin(4, 4, 4, 4),
               legend.box = "horizontal")
     }
 
