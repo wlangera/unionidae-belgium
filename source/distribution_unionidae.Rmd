@@ -328,7 +328,7 @@ example_p1 <- create_atlas_map(
 example_p1
 ```
 
-```{r}
+```{r, out.width="100%"}
 example_p2 <- create_atlas_map(
   data_post_1995_utm10km,
   old_data = data_pre_1995_utm10km,
@@ -342,6 +342,30 @@ example_p2
 
 ```{r}
 devices <- c("png", "pdf")
-save_figure(example_p2, "test", devices,
-            dpi = 300, width = 8, height = 6)
+
+for (spec in sort(unique(data_pre_1995_utm10km$spec_name))) {
+  file1 <- paste(tolower(gsub("\\s", "_", spec)), "utm10km",
+                 sep = "_")
+  p1 <- create_atlas_map(
+    data_post_1995_utm10km,
+    species = spec,
+    grid_utm10 = utm10_sf,
+    belgium_map = belgium_sf,
+    waterlopen_map = waterlopen_sf,
+    crs = proj_crs)
+  
+  file2 <- paste(tolower(gsub("\\s", "_", spec)), "utm10km", "nijs1995",
+                 sep = "_")
+  p2 <- create_atlas_map(
+    data_post_1995_utm10km,
+    old_data = data_pre_1995_utm10km,
+    species = spec,
+    grid_utm10 = utm10_sf,
+    belgium_map = belgium_sf,
+    waterlopen_map = waterlopen_sf,
+    crs = proj_crs)
+  
+  save_figure(p1, file1, devices, dpi = 300, width = 8, height = 6)
+  save_figure(p2, file2, devices, dpi = 300, width = 8, height = 6)
+}
 ```
