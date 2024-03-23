@@ -35,6 +35,7 @@ library(readxl)
 
 # Source
 source(here("source", "read_excel_allsheets.R"))
+source(here("source", "create_atlas_map.R"))
 ```
 
 # Read in data
@@ -307,48 +308,14 @@ data_pre_1995_utm10km <- data_pre_1995 %>%
   select(utm_10km, period, spec_name, genus, species, author, state_fill)
 ```
 
-```{r}
-pattern <- data_post_1995_utm10km %>%
-  filter(spec_name == "Anodonta anatina") %>%
-  mutate(pattern = ifelse(state_fill == "levend + leeg",
-                          "stripe", "none")) %>%
-  pull(pattern)
+# Create atlas figures
 
-data_post_1995_utm10km %>%
-  filter(spec_name == "Anodonta anatina") %>%
-  full_join(utm10_sf, by = join_by(utm_10km == TAG)) %>%
-  st_as_sf() %>%
-  drop_na() %>%
-  ggplot() +
-    geom_sf(data = belgium_sf, fill = "white",
-            linewidth = 0.8) +
-    geom_sf(data = waterlopen_sf, aes(colour = waterloop),
-            linewidth = 0.8) +
-    scale_color_manual(values = c("cornflowerblue", "darkblue"),
-                       guide = guide_legend(
-                         override.aes = list(
-                           linewidth = 1.5))) +
-    geom_sf_pattern(aes(fill = state_fill),
-                    linewidth = 0.6, alpha = 0.7,
-                    pattern = pattern,
-                    pattern_colour = alpha("green", 0.7),
-                    pattern_fill = alpha("green", 0.7),
-                    pattern_density = 0.1,
-                    pattern_spacing = 0.015
-                    ) +
-    scale_fill_manual(values = c("red", "red", "green"),
-                      na.translate = FALSE,
-                      guide = guide_legend(
-                        override.aes = list(pattern = c("none", 
-                                                        "stripe",
-                                                        "none"),
-                                            pattern_density = 0.2,
-                                            pattern_spacing = 0.03))) +
-    geom_sf(data = utm10_sf, fill = alpha("white", 0),
-            linewidth = 0.6) +
-    labs(x = "", y = "", fill = "Status", colour = "Waterloop") +
-    coord_sf(datum = proj_crs) +
-    theme_void() +
-    theme(legend.position = c(0.2, 0.2),
-          legend.box = "horizontal")
+```{r}
+create_atlas_map(data_post_1995_utm10km, species = "Anodonta anatina",
+                 crs = proj_crs)
+
+create_atlas_map(data_post_1995_utm10km, species = "Anodonta anatina",
+                 old_data = data_pre_1995_utm10km, crs = proj_crs)
 ```
+
+
