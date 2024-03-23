@@ -313,7 +313,10 @@ data_pre_1995_utm10km <- data_pre_1995 %>%
 ```{r}
 create_atlas_map(data_post_1995_utm10km, species = "Anodonta anatina",
                  crs = proj_crs)
+```
 
+
+```{r}
 create_atlas_map(data_post_1995_utm10km, species = "Anodonta anatina",
                  old_data = data_pre_1995_utm10km, crs = proj_crs)
 ```

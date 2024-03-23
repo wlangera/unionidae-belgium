@@ -15,6 +15,11 @@ create_atlas_map <- function(data, species,
       st_as_sf() %>%
       drop_na()
 
+    pattern <- plot_data %>%
+      mutate(pattern = ifelse(state_fill == "levend + leeg",
+                              "stripe", "none")) %>%
+      pull(pattern)
+
     if (missing(old_data)) {
       p <- ggplot(plot_data) +
         geom_sf(data = belgium_map, fill = "white",
