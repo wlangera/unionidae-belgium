@@ -80,7 +80,7 @@ create_atlas_map <- function(data,
                                                 pattern_density = 0.2,
                                                 pattern_spacing = 0.03))) +
         geom_sf(data = centroids_old_data, aes(shape = state_fill),
-                size = 2.5) +
+                size = 2.8) +
         scale_shape_manual(values = c(16, 17, 15),
                            guide = guide_legend(
                              override.aes = list(size = 3))) +
