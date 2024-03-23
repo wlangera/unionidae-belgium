@@ -311,14 +311,23 @@ data_pre_1995_utm10km <- data_pre_1995 %>%
 # Create atlas figures
 
 ```{r}
-create_atlas_map(data_post_1995_utm10km, species = "Anodonta anatina",
+create_atlas_map(data_post_1995_utm10km,
+                 species = "Anodonta anatina",
+                 grid_utm10 = utm10_sf,
+                 belgium_map = belgium_sf,
+                 waterlopen_map = waterlopen_sf,
                  crs = proj_crs)
 ```
 
 
 ```{r}
-create_atlas_map(data_post_1995_utm10km, species = "Anodonta anatina",
-                 old_data = data_pre_1995_utm10km, crs = proj_crs)
+create_atlas_map(data_post_1995_utm10km,
+                 old_data = data_pre_1995_utm10km,
+                 species = "Anodonta anatina",
+                 grid_utm10 = utm10_sf,
+                 belgium_map = belgium_sf,
+                 waterlopen_map = waterlopen_sf,
+                 crs = proj_crs)
 ```
 
 

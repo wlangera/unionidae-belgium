@@ -1,12 +1,13 @@
-create_atlas_map <- function(data, species,
-                             grid_utm10 = utm10_sf,
+create_atlas_map <- function(data,
+                             species,
+                             grid_utm10,
                              grid_utm5,
                              old_data,
                              alpha = 0.75,
                              alive_col = "red",
                              empty_col = "green",
-                             belgium_map = belgium_sf,
-                             waterlopen_map = waterlopen_sf,
+                             belgium_map,
+                             waterlopen_map,
                              crs) {
   if (missing(grid_utm5)) {
     plot_data <- data %>%
