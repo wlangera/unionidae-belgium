@@ -36,6 +36,7 @@ library(readxl)
 # Source
 source(here("source", "read_excel_allsheets.R"))
 source(here("source", "create_atlas_map.R"))
+source(here("source", "save_figure.R"))
 ```
 
 # Read in data
@@ -339,4 +340,8 @@ example_p2 <- create_atlas_map(
 example_p2
 ```
 
-
+```{r}
+devices <- c("png", "pdf")
+save_figure(example_p2, "test", devices,
+            dpi = 300, width = 8, height = 6)
+```
