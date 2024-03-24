@@ -3,7 +3,7 @@ create_atlas_map <- function(data,
                              grid_utm10,
                              grid_utm5,
                              old_data,
-                             alpha = 0.75,
+                             alpha = 0.85,
                              alive_col = "red",
                              empty_col = "green",
                              belgium_map,
@@ -51,8 +51,7 @@ create_atlas_map <- function(data,
                                                 pattern_spacing = 0.03))) +
         geom_sf(data = grid_utm10, fill = alpha("white", 0),
                 linewidth = 0.6) +
-        labs(x = "", y = "", shape = "Vóór 1995", fill = "Na 1995",
-             colour = "Waterloop")
+        labs(x = "", y = "", fill = "Na 1995", colour = "Waterloop")
     } else {
       suppressWarnings({
         centroids_old_data <- old_data %>%
@@ -88,10 +87,49 @@ create_atlas_map <- function(data,
                 linewidth = 0.6) +
         labs(x = "", y = "", shape = "Vóór 1995", fill = "Na 1995",
              colour = "Waterloop")
+
+      if (nrow(centroids_old_data) == 0) {
+        p <- p +
+          annotate("label", x = 735000, y = 5705000,
+                   hjust = "center", vjust = "center",
+                   fontface = "bold", size = 5, fill = "lightgrey",
+                   label = "Geen data\nvóór 1995")
+      }
     }
 
   } else {
-    print("nog doen")
+    plot_data <- data %>%
+      filter(spec_name == !!species) %>%
+      full_join(grid_utm5, by = join_by(utm_5km == TAG)) %>%
+      st_as_sf() %>%
+      drop_na()
+
+    pattern <- plot_data %>%
+      mutate(pattern = ifelse(state_fill == "levend + leeg",
+                              "stripe", "none")) %>%
+      pull(pattern)
+
+    p <- base_plot +
+      geom_sf_pattern(data = plot_data, aes(fill = state_fill),
+                      linewidth = 0.6, alpha = alpha,
+                      pattern = pattern,
+                      pattern_colour = alpha(empty_col, alpha),
+                      pattern_fill = alpha(empty_col, alpha),
+                      pattern_density = 0.1,
+                      pattern_spacing = 0.01
+      ) +
+      scale_fill_manual(values = c(alive_col, alive_col, empty_col),
+                        guide = guide_legend(
+                          override.aes = list(pattern = c("none",
+                                                          "stripe",
+                                                          "none"),
+                                              pattern_density = 0.2,
+                                              pattern_spacing = 0.03))) +
+      geom_sf(data = grid_utm5, fill = alpha("white", 0),
+              linewidth = 0.3, colour = "grey") +
+      geom_sf(data = grid_utm10, fill = alpha("white", 0),
+              linewidth = 0.6) +
+      labs(x = "", y = "", fill = "Na 1995", colour = "Waterloop")
   }
 
   out_plot <- p +
