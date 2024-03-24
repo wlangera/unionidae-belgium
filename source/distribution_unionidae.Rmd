@@ -324,18 +324,23 @@ example_p1 <- create_atlas_map(
   grid_utm10 = utm10_sf,
   belgium_map = belgium_sf,
   waterlopen_map = waterlopen_sf,
+  alive_col = "#009E50",
+  empty_col = "#D55E00",
   crs = proj_crs)
 example_p1
 ```
 
-```{r, out.width="100%"}
+```{r}
 example_p2 <- create_atlas_map(
-  data_post_1995_utm10km,
+  data_post_1995_utm5km,
   old_data = data_pre_1995_utm10km,
   species = example_spec,
   grid_utm10 = utm10_sf,
+  grid_utm5 = utm5_sf,
   belgium_map = belgium_sf,
   waterlopen_map = waterlopen_sf,
+  alive_col = "#009E50",
+  empty_col = "#D55E00",
   crs = proj_crs)
 example_p2
 ```
@@ -343,7 +348,9 @@ example_p2
 ```{r}
 devices <- c("png", "pdf")
 
+# UTM 10 km
 for (spec in sort(unique(data_pre_1995_utm10km$spec_name))) {
+  # Only data after 1995
   file1 <- paste(tolower(gsub("\\s", "_", spec)), "utm10km",
                  sep = "_")
   p1 <- create_atlas_map(
@@ -352,8 +359,11 @@ for (spec in sort(unique(data_pre_1995_utm10km$spec_name))) {
     grid_utm10 = utm10_sf,
     belgium_map = belgium_sf,
     waterlopen_map = waterlopen_sf,
+    alive_col = "#009E50",
+    empty_col = "#D55E00",
     crs = proj_crs)
   
+  # Including data before 1995
   file2 <- paste(tolower(gsub("\\s", "_", spec)), "utm10km", "nijs1995",
                  sep = "_")
   p2 <- create_atlas_map(
@@ -363,9 +373,29 @@ for (spec in sort(unique(data_pre_1995_utm10km$spec_name))) {
     grid_utm10 = utm10_sf,
     belgium_map = belgium_sf,
     waterlopen_map = waterlopen_sf,
+    alive_col = "#009E50",
+    empty_col = "#D55E00",
     crs = proj_crs)
   
   save_figure(p1, file1, devices, dpi = 300, width = 8, height = 6)
   save_figure(p2, file2, devices, dpi = 300, width = 8, height = 6)
+}
+
+# UTM 5 km
+for (spec in sort(unique(data_pre_1995_utm10km$spec_name))) {
+  file3 <- paste(tolower(gsub("\\s", "_", spec)), "utm5km",
+                 sep = "_")
+  p3 <- create_atlas_map(
+    data_post_1995_utm5km,
+    species = spec,
+    grid_utm10 = utm10_sf,
+    grid_utm5 = utm5_sf,
+    belgium_map = belgium_sf,
+    waterlopen_map = waterlopen_sf,
+    alive_col = "#009E50",
+    empty_col = "#D55E00",
+    crs = proj_crs)
+  
+  save_figure(p3, file3, devices, dpi = 300, width = 8, height = 6)
 }
 ```
