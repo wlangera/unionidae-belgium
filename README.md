@@ -1,3 +1,3 @@
 # unionidae-belgium
 
-Repo to make Distribution maps of freshwater mussels in Belgium.
+Repo to make Distribution maps for freshwater mussels in Belgium.
