@@ -13,7 +13,7 @@ create_atlas_map <- function(data,
     geom_sf(data = belgium_map, fill = "white",
             linewidth = 0.8) +
     geom_sf(data = waterlopen_map, aes(colour = waterloop),
-            linewidth = 0.8) +
+            linewidth = 0.5) +
     scale_color_manual(values = c("cornflowerblue", "darkblue"),
                        guide = guide_legend(
                          keywidth = unit(1, "cm"),
