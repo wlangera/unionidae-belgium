@@ -341,6 +341,7 @@ example_p2 <- create_atlas_map(
   waterlopen_map = waterlopen_sf,
   alive_col = "#009E50",
   empty_col = "#D55E00",
+  alpha = 1,
   crs = proj_crs)
 example_p2
 ```
@@ -394,6 +395,7 @@ for (spec in sort(unique(data_pre_1995_utm10km$spec_name))) {
     waterlopen_map = waterlopen_sf,
     alive_col = "#009E50",
     empty_col = "#D55E00",
+    alpha = 1,
     crs = proj_crs)
   
   save_figure(p3, file3, devices, dpi = 300, width = 8, height = 6)
